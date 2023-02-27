@@ -1,0 +1,34 @@
+server:
+  port: 9102
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+
+spring:
+  thymeleaf:
+    cache: false
+  application:
+    name: item-web
+  main:
+    allow-bean-definition-overriding: true
+feign:
+  hystrix:
+    enabled: true
+  client:
+    config:
+      default:
+        connectTimeout: 10000 #连接超时配置
+        readTimeout: 60000 #执行超时配置
+#设定Hystrix熔断超时时间 ，理论上熔断时间应该大于总连接超时时间
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 6000
+
+# 自动定义配置指定要生成静态页面所在的目录
+pagepath: E:\\items

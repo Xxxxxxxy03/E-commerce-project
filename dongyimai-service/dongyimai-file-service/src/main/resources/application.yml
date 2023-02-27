@@ -1,0 +1,15 @@
+server:
+  port: 9002
+spring:
+  application:
+    name: file
+  servlet:
+    multipart:
+      max-request-size: 100MB #单个请求可能包含多个上传文件  总的文件大小限制
+      max-file-size: 100MB #单个文件最大限制
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+#配置当前服务地址和端口
+FILE_SERVER_URL: http://192.168.188.129:8080/

@@ -1,0 +1,38 @@
+server:
+  port: 9003
+spring:
+  application:
+    name: canal
+  redis:
+    host: 192.168.188.129
+    port: 6379
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+canal:
+  client:
+    instances:
+      example:
+        host: 192.168.188.129
+        port: 11111
+feign:
+  hystrix:
+    enabled: true
+  client:
+    config:
+      default:
+        connectTimeout: 10000 #连接超时配置
+        readTimeout: 60000 #执行超时配置
+#设定Hystrix熔断超时时间
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 70000
+
+#设置feign熔断时间
+
+#配置对接到canal server

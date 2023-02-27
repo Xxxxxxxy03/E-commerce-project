@@ -1,0 +1,30 @@
+server:
+  port: 9100
+spring:
+  application:
+    name: user-auth
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://192.168.188.129:3307/dongyimaidb
+    username: root
+    password: root
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+ #自定义配置
+auth:
+  ttl: 3600  #token过期时间
+  clientId: dongyimai  #客户端账号
+  clientSecret: 123 #客户端密码
+  cookieDomain: localhost #cookie域名
+  cookieMaxAge: -1     #cookie有效期 -1表示关闭浏览器就失效
+encrypt:
+  key-store:
+    location: classpath:dongyimai.jks #秘钥文件存储目录
+    alias: dongyimai
+    password: dongyimai #秘钥库密码
+    secret: dongyimai #秘钥密码
+logging:
+  level:
+    com.offcn: debug

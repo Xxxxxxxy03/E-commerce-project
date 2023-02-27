@@ -1,0 +1,63 @@
+server:
+  port: 8001
+spring:
+  application:
+    name: gateway-web
+  redis:
+    host: 192.168.188.129
+    port: 6379
+  cloud:
+    gateway:
+      routes:
+        - id: test-route-01 #路由名称
+          uri: lb://dym-sellergoods #使用服务名进行转发 支持负载均衡
+          #uri: http://localhost:9001 #转发到微服务地址和端口
+          predicates:
+            - Path=/api/brand/**
+           #- Path=/goods/**,/brand/** #路径前缀
+           # - Host=cloud.ujiuye.com**,qq.ujiuye.com** #配置主机域名 **通配符表示域名后面请求路径
+          filters:
+           # - PrefixPath=/brand #自动填充转发路径
+            - StripPrefix=1 #把请求路径第一组路径移除
+            - name: RequestRateLimiter #启用限流过滤器
+              args:
+                key-resolver: "#{@ipKeyResolver}"
+                redis-rate-limiter.replenishRate: 1  #令牌发放速率 每秒1个
+                redis-rate-limiter.burstCapacity: 1  #桶容量
+        - id: dongyimai-user-route #路由转发到用户微服务
+          uri: http://localhost:9007
+          predicates: #断言，判断条件，请求路径满足条件后，触发跳转
+            - Path=/api/user/**,/api/address/**,/api/areas/**,/api/cities/**,/api/provinces/**
+          filters:  #过滤器，StripPrefix 跳转前对url进行处理，截取掉第一组路径
+              - StripPrefix=1 #把请求路径第一组路径移除
+        - id: dongyimai_goods_route #商品微服务的路由规则
+          uri: http://localhost:9001
+          predicates:
+            - Path=/api/album/**,/api/brand/**,/api/cache/**,/api/categoryBrand/**,/api/category/**,/api/para/**,/api/pref/**,/api/sku/**,/api/spec/**,/api/spu/**,/api/stockBack/**,/api/template/**
+          filters:
+            - StripPrefix=1
+        - id: dongyimai_order_route #订单微服务路由规则
+          uri: http://localhost:9008
+          predicates:
+            - Path=/api/cart/**,/api/order/**,/api/orderItem/**
+          filters:
+            - StripPrefix=1
+        - id: dongyimai_pay_route #支付微服务
+          uri: http://localhost:9009
+          predicates:
+            - Path=/api/pay/**
+          filters:
+            - StripPrefix=1
+        - id: dongyimai_seckill_route
+          uri: http://localhost:9010
+          predicates:
+            - Path=/api/seckillOrder/**,/api/seckillGoods/**
+          filters:
+            - StripPrefix=1
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+#自定义要跳转到授权服务器的登录地址
+USER_LOGIN_URL: http://localhost:9100/oauth/login

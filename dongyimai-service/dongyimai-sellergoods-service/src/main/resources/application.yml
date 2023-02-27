@@ -1,0 +1,21 @@
+server:
+  port: 9001
+spring:
+  application:
+    name: dym-sellergoods
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.188.129:3307/dongyimaidb
+    username: root
+    password: root
+    type: com.alibaba.druid.pool.DruidDataSource #启用指定连接池
+  redis:
+    host: 192.168.188.129
+    port: 6379
+eureka:
+  client:
+    defaultZone: http://localhost:8761/eureka
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true #开启驼峰命名

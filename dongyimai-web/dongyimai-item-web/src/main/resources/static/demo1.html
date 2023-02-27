@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>二维码生成演示程序</title>
+    <script src="qrious.min.js"></script>
+</head>
+<body>
+<!--首先创建一个图片标签，用来显示二维码-->
+<img id="myimg">
+
+<!--编写java脚本，生成二维码-->
+<script>
+    var qr = new QRious({
+        element:document.getElementById('myimg'),//绑定二维码对象到指定图片标签
+        size: 200,//二维码尺寸 像素
+        level: 'H',//二维码容错级别
+        value: "https://qr.alipay.com/bax07753kboijswyhdjg0035"//二维码存储内容
+
+    })
+</script>
+</body>
+</html>

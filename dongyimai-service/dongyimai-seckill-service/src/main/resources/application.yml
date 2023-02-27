@@ -1,0 +1,25 @@
+server:
+  port: 9010
+spring:
+  application:
+    name: seckill
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.188.129:3307/dongyimaidb
+    username: root
+    password: root
+  redis:
+    host: 192.168.188.129
+    port: 6379
+  jackson:
+    time-zone: GMT+8 #设置时区 东八区
+    date-format: yyyy-MM-dd HH:mm:ss #设置转换格式
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+mybatis-plus:
+  type-aliases-package: com.offcn.seckill.pojo
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

@@ -1,0 +1,39 @@
+server:
+  port: 9009
+spring:
+  application:
+    name: pay
+  redis:
+    host: 192.168.188.129
+    port: 6379
+  main:
+    allow-bean-definition-overriding: true
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+#把支付宝相关参数配置
+alipay:
+  serverUrl: https://openapi.alipaydev.com/gateway.do #支付宝网关地址 沙箱环境网关地址
+  appId: 2021000121681407 #应用编号
+  privateKey: MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCajuVGoKuf6qes3Ps2MLpHC2ELDpz7gTDgo/edp6e1nRhhxoJ6cXlWb5uOqKHdwPfn3vh8ymwOs7EUP6ypvHztxrFCRRfC8cB+R/bf7S+o5rekQzcwF7aVaK1v9Y/mcOSGfCkymg1OKDdLEM/KDZr6gaFpeZ/ZQRo2B7Ty570YT/YQPBJlSxPojxVLkqhNnhe5OWJhvRHBBufoWpbkudA+Lc9ycIPbhvoEpE90ED7/n00Wy/+5cNMEE/CLbCMXF/LunhoH6O4KccHrgcIDVNJz29SV7SDEzZtRoPapGr14jLHucwsJvIO3piOHScDw5AsOVuTAL2msEbPBPd2xZd37AgMBAAECggEAYr+JnWZqQPIbz0Yg+q6HVXzfs8DSa55PLDeWrRPBAzgrq8y48KIvdBo6uRrk0FnKCktbV9+8ymfka5uDJa9X4lNgTYb3d4YeBpDUGp3gJXnDOx/20rNT5IHMzguGtSTL3WDWsY3bkmP/b+Z93Ap1SjgoeMtMZfJCXOLvqYKGPlFX87ixHsppD2K2fOHBYCf9kTKP8Po4l3ztDN+3C6cf2s7VLITrDt+rPCTTiVOE1MtbMdBt8u6LFRcjx5ouMCVEutYkNzNjF7qlp2y2wcI4UMJoEn0AwmB6WR8DN9Ll+j+tiXwvjjEjGnIi0osCpfmYCqKurwlfeD12GWDOarOzgQKBgQDi4XWFi1eUg0YMyrzfPbuqxVVI+V0Fcd0rEHiZqkI6/+ccJhGeiWtNENzkU5ntPiKpIt3nJ134t+0VT+dZQlol+K22MXBhch5Pds0WHj5pTnSpk2tv4PS3HCbbiwYNedLm8y0Kio/2+4a+1/Ys8h4VIJWaf6BJfwfP6MjDHJbahQKBgQCuZSkgBxMLztxqOteOjYdE/DSAfYpYsp081RDSaSOt4fC3C0Hk6ADojSnUS/Mmwtrw27JtEXWRM8fRKh5uZvbNDtEwyn15pb3LqCVGj4lKN1Yw2WPu6bV/+wUiHm9ItmaYvixRO/dTokP+0tld5MaPSaRgJ16dedj9PMfQQ5p+fwKBgQCwA/JE9OGxWlbSPcdh+mbKCeYsgylju/62FkU6Ehjn5PjLoc0xjbMtStPUX/efUwFY7q/xUV1aRHcufZsiaJO/uborCxgAwaQ6ShS6ACSzVia0GKbVWVUBalnLIYREmCrC+g4Li4w9NM5I6QsXu48THQBzqGgWHPNWnWaD2H5AcQKBgAuCR42CigI8e5VTHsiclHG8Byb3ofqqhu/ty7dnEuC1yXH6/zVBDlZKgpktDfXf5B0DEqpZ/Z1Ago5OLkXw65aqxKloo5E0m+rlxNf8Pv4z2q9MmWi56a1xfmw6//MXfnvUCQ6vW2ociko11fx5TZVFMeDamEbiNKy5pyIaZAa3AoGBAJYHqsInB+dqBjL+pK6D0MKIBNscSzAfgkP5MZ6l0qBmHe1GO7AEBXAX/EdnwvG6UcLqNv+duspe4VCX16oznYyzXa9JM6KesADjtG9O7cHXbAj4uChiGZk7ylzoPV0B1FsWu9HrEXs79Bo3EQ0MAwz/RbyKRafuXaNiu3ssxWnx
+  format: json #数据传输格式
+  charset: UTF-8
+  alipayPublicKey: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtyV0Wnf5awbPp9za5La6H79xp1YFi+El9Qd0ZPmb77TerUq3+NIBoamdekD9ZCCqhQn5htQJtVowJzLGm8IxNVhUBYKSOFp9NufRV6/FCV3Cwnyi8Y3e6XZ4z4MPAXa4TDs3U9xMab9izaLjOA2VBG0rZDrOOqIg36wjfIUMrJFYQiAu9LcDeQxqx28ws0UfUw8zo+mDHotuZfa/UKP0dr0NrEpKB8lRRB/C4ypilN9F3CkCLvtJ2AGnlFDBwasJ5n0B/G0SXeFEl4waCBi1e/mr5AWGWoq7cf5kE52Ve1KUBwVsT3YFqxbLyRDdQ6laTZsluSQzrNysB1tMc5fBkQIDAQAB
+  signType: RSA2 #密钥类型
+logging:
+  level:
+    com.offcn: debug
+feign:
+  hystrix:
+    enabled: true
+#hystrix 配置
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000
+          strategy: SEMAPHORE #feign和主线程在一起，不要单独启用独立线程

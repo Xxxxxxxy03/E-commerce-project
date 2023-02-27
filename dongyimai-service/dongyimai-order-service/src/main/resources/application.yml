@@ -1,0 +1,48 @@
+server:
+  port: 9008
+spring:
+  application:
+    name: order
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://192.168.188.129:3307/dongyimaidb
+    username: root
+    password: root
+    type: com.alibaba.druid.pool.DruidDataSource
+
+  redis:
+    host: 192.168.188.129
+    port: 6379
+
+  main:
+    allow-bean-definition-overriding: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    lease-renewal-interval-in-seconds: 5 #每隔5秒发送一次心疼
+    lease-expiration-duration-in-seconds: 10 #10秒不发送就过期
+feign:
+  hystrix:
+    enabled: true
+#hystrix 配置
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000
+          strategy: SEMAPHORE #feign和主线程在一起，不要单独启用独立线程
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true #开启驼峰式编写规范
+  type-aliases-package: com.offcn.order.pojo
+  #配置sql打印日志
+logging:
+  level:
+    com.offcn: debug
+
