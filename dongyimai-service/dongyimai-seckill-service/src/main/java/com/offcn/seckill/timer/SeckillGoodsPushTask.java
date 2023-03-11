@@ -68,7 +68,25 @@ public class SeckillGoodsPushTask {
             //遍历集合存储到redis
             for (SeckillGoods seckillGoods : seckillGoodsList) {
                 redisTemplate.boundHashOps("SeckillGoods_" + extName).put(seckillGoods.getId(), seckillGoods);
+
+                //为每个商品准备一个货架  redis的list结构
+                Long[] ids = pushIds(seckillGoods.getStockCount(), seckillGoods.getId());
+                redisTemplate.boundListOps("SeckillGoodsCountList_"+seckillGoods.getId()).leftPushAll(ids);
+
+                //同时记录每个秒杀商品剩余库存  使用put  写入对象value就会当成字符串处理，希望存储的是数值
+                redisTemplate.boundHashOps("SeckillGoodsCount").increment(seckillGoods.getId(),seckillGoods.getStockCount());
+
             }
         }
+    }
+
+    private Long[] pushIds(int len,Long id){
+        Long[] longs = new Long[len];
+        //循环遍历数组
+        for (int i = 0; i < longs.length; i++) {
+            //设置每个数组元素值为商品编号
+            longs[i] = id;
+        }
+        return longs;
     }
 }

@@ -20,6 +20,7 @@
     <module>dongyimai-order-service</module>
     <module>dongyimai-pay-service</module>
     <module>dongyimai-seckill-service</module>
+    <module>dongyimai-payseckill-service</module>
 </modules>
     <artifactId>dongyimai-service</artifactId>
     <version>1.0</version>

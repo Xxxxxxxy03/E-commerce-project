@@ -20,7 +20,7 @@ import java.util.Date;
 public class SeckillOrder implements Serializable{
 
 	@ApiModelProperty(value = "主键",required = false)
-    @TableId(type = IdType.AUTO)
+    @TableId(type = IdType.INPUT)
     @TableField(value = "id")
 	private Long id;//主键
 

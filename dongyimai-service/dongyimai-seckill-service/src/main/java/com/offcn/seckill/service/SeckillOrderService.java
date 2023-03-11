@@ -3,7 +3,7 @@ package com.offcn.seckill.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.offcn.entity.PageResult;
 import com.offcn.seckill.pojo.SeckillOrder;
-import com.offcn.seckill.pojo.SeckillStatus;
+import com.offcn.seckill.entity.SeckillStatus;
 
 import java.util.List;
 /****
@@ -84,4 +84,9 @@ public interface SeckillOrderService extends IService<SeckillOrder> {
      * @return
      */
     SeckillStatus queryStatus(String username);
+
+    void updatePayStatus(String out_trade_no,String trade_no,String username);
+
+
+    void closeOrder(String username);
 }

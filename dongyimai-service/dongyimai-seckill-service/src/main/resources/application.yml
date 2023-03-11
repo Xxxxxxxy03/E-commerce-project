@@ -1,6 +1,11 @@
 server:
   port: 9010
 spring:
+  rabbitmq:
+    host: 192.168.188.129
+    port: 5672
+    username: guest
+    password: guest
   application:
     name: seckill
   datasource:
@@ -14,6 +19,8 @@ spring:
   jackson:
     time-zone: GMT+8 #设置时区 东八区
     date-format: yyyy-MM-dd HH:mm:ss #设置转换格式
+  main:
+    allow-bean-definition-overriding: true
 
 eureka:
   client:
@@ -21,5 +28,41 @@ eureka:
       defaultZone: http://localhost:8761/eureka
 mybatis-plus:
   type-aliases-package: com.offcn.seckill.pojo
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+logging:
+  level:
+    com.offcn: debug
+#位置支付交换机和队列
+mq:
+  pay:
+    exchange:
+      seckillorder: exchange.seckillorder
+      seckillordertimer: exchange.seckillordertimer
+    queue:
+      seckillorder: queue.seckillorder
+      seckillordertimer: queue.seckillordertimer
+      seckillordertimerdelay: queue.seckillordertimerdelay
+    routing:
+      seckillkey: queue.seckillorder
+      seckillordertimerkey: queue.seckillordertime
+feign:
+  hystrix:
+    enabled: true
+  client:
+    config:
+      default:
+        connectTimeout: 5000  #连接超时时间5秒
+        readTimeout: 5000     #读超时时间5秒
+#hystrix 配置
+hystrix:
+  command:
+    default:
+      execution:
+        timeout:
+          #如果enabled设置为false，则请求超时交给ribbon控制
+          enabled: true
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000
+          strategy: SEMAPHORE

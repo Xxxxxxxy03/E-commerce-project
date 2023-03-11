@@ -7,8 +7,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.offcn.entity.PageResult;
 import com.offcn.seckill.dao.SeckillGoodsMapper;
 import com.offcn.seckill.dao.SeckillOrderMapper;
+import com.offcn.seckill.pojo.SeckillGoods;
 import com.offcn.seckill.pojo.SeckillOrder;
-import com.offcn.seckill.pojo.SeckillStatus;
+import com.offcn.seckill.entity.SeckillStatus;
 import com.offcn.seckill.service.SeckillOrderService;
 import com.offcn.seckill.task.MultiThreadingCreateOrder;
 import com.offcn.utils.IdWorker;
@@ -38,6 +39,7 @@ public class SeckillOrderServiceImpl extends ServiceImpl<SeckillOrderMapper, Sec
     @Autowired
     private SeckillGoodsMapper seckillGoodsMapper;
 
+    //注入多线程下单程序
     @Autowired
     private MultiThreadingCreateOrder multiThreadingCreateOrder;
 
@@ -207,16 +209,25 @@ public class SeckillOrderServiceImpl extends ServiceImpl<SeckillOrderMapper, Sec
      */
     @Override
     public boolean add(Long id, String time, String username) {
-        //排队信息封装
+
+        //记录指定用户下单次数  redis  每次把指定用户下单次数递增一
+        Long count = redisTemplate.boundHashOps("UserQueueCount").increment(username, 1);
+
+        //判断下单次数是否大于1，如果大于1就不是首次下单
+        if (count > 1) {
+            throw new RuntimeException("不要重复下单");
+        }
+
+        // 创建秒杀信息状态对象，并设置相关属性
         SeckillStatus seckillStatus = new SeckillStatus(username, new Date(), 1, id, time);
 
-        //将秒杀抢单信息存入到redis中，这里采用list存储，list本身是一个队列
+        //将秒杀下单状态存入到redis队列中，这里采用list存储，list本身是一个队列  先进先出  头   尾
         redisTemplate.boundListOps("SeckillOrderQueue").leftPush(seckillStatus);
 
-        //将抢单状态存入到redis中
+        //将下单状态存入到redis中
         redisTemplate.boundHashOps("UserQueueStatus").put(username, seckillStatus);
 
-        //多线程操作
+        //调用多线程下单
         try {
             multiThreadingCreateOrder.createOrder();
             return true;
@@ -227,7 +238,7 @@ public class SeckillOrderServiceImpl extends ServiceImpl<SeckillOrderMapper, Sec
     }
 
     /**
-     * 抢单状态查询
+     * 下单状态查询
      *
      * @param username
      * @return
@@ -235,5 +246,75 @@ public class SeckillOrderServiceImpl extends ServiceImpl<SeckillOrderMapper, Sec
     @Override
     public SeckillStatus queryStatus(String username) {
         return (SeckillStatus) redisTemplate.boundHashOps("UserQueueStatus").get(username);
+    }
+
+    @Override
+    public void updatePayStatus(String out_trade_no, String trade_no, String username) {
+        //根据用户名去redis读取对应订单
+        SeckillOrder seckillOrder = (SeckillOrder) redisTemplate.boundHashOps("SeckillOrder").get(username);
+
+        //判断秒杀订单是否为空
+        if (seckillOrder != null) {
+            //修改订单状态
+            seckillOrder.setStatus("1");
+            //    设置支付宝返回交易流水号
+            seckillOrder.setTransactionId(trade_no);
+            //支付时间
+            seckillOrder.setPayTime(new Date());
+            this.baseMapper.insert(seckillOrder);
+            //清空redis该用户对应吗，秒杀订单
+            redisTemplate.boundHashOps("SeckillOrder").delete(username);
+            //清空排队状态
+            redisTemplate.boundHashOps("UserQueueCount").delete(username);
+
+            SeckillStatus seckillStatus = (SeckillStatus) redisTemplate.boundHashOps("UserQueueStatus").get(username);
+
+            //修改状态
+            seckillStatus.setStatus(5);
+            redisTemplate.boundHashOps("UserQueueStatus").put(username,seckillStatus    );
+        }
+    }
+
+    //关闭订单
+    @Override
+    public void closeOrder(String username) {
+        //获取秒杀订单状态
+        SeckillStatus seckillStatus = (SeckillStatus) redisTemplate.boundHashOps("UserQueueStatus").get(username);
+
+        //去redis缓存根据用户名获取订单
+        SeckillOrder seckillOrder = (SeckillOrder) redisTemplate.boundHashOps("SeckillOrder").get(username);
+
+        //判断秒杀状态和订单是否为空
+        if(seckillStatus!=null && seckillOrder!=null){
+            //删除订单
+            redisTemplate.boundHashOps("SeckillOrder").delete(username);
+
+        //    根据商品编号。获取秒杀撒谎那个票信息
+            SeckillGoods seckillGoods = (SeckillGoods) redisTemplate.boundHashOps("SeckillGoods_" + seckillStatus.getTime()).get(seckillStatus.getGoodsId());
+            //判断秒杀商品对象是否为空
+            if(seckillGoods == null){
+                //继续从数据库读取秒杀商品
+                seckillGoods = seckillGoodsMapper.selectById(seckillStatus.getGoodsId());
+            }
+
+            //更新秒杀商品剩余库存
+            Long count = redisTemplate.boundHashOps("SeckillGoodsCount").increment(seckillStatus.getGoodsId(), 1);
+
+            //更新设置最新剩余库存到秒杀商品对象
+            seckillGoods.setStockCount(count.intValue());
+
+            //八十秒杀商品更新回redis缓存中的秒杀商品集合
+            redisTemplate.boundHashOps("SeckillGoods_"+seckillStatus.getTime()).put(seckillStatus.getGoodsId(),seckillGoods);
+
+            //货架
+            redisTemplate.boundListOps("SeckillGoodsCountList_"+seckillStatus.getGoodsId()).leftPush(seckillGoods.getGoodsId());
+
+        //    把用户排队次数清空，用户可以继续进行后续秒杀
+            redisTemplate.boundHashOps("UserQueueCount").delete(username);
+            //更新该用户秒杀排队信息状态
+            seckillStatus.setStatus(3);
+
+            redisTemplate.boundHashOps("UserQueueStatus").put(username,seckillStatus);
+        }
     }
 }

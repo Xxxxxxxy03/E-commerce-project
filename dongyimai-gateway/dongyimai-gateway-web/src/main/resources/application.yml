@@ -48,12 +48,18 @@ spring:
             - Path=/api/pay/**
           filters:
             - StripPrefix=1
+#        - id: dongyimai_seckill_route
+#          uri: http://localhost:9010
+#          predicates:
+#            - Path=/api/seckillOrder/**,/api/seckillGoods/**
+#          filters:
+#            - StripPrefix=1
         - id: dongyimai_seckill_route
-          uri: http://localhost:9010
+          uri: lb://seckill
           predicates:
-            - Path=/api/seckillOrder/**,/api/seckillGoods/**
+              - Path=/api/seckillOrder/**,/api/seckillGoods/**
           filters:
-            - StripPrefix=1
+              - StripPrefix=1
 eureka:
   client:
     service-url:

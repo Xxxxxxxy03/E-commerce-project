@@ -4,7 +4,7 @@ import com.offcn.entity.PageResult;
 import com.offcn.entity.Result;
 import com.offcn.entity.StatusCode;
 import com.offcn.seckill.pojo.SeckillOrder;
-import com.offcn.seckill.pojo.SeckillStatus;
+import com.offcn.seckill.entity.SeckillStatus;
 import com.offcn.seckill.service.SeckillOrderService;
 import com.offcn.utils.TokenDecode;
 import io.swagger.annotations.*;
@@ -158,17 +158,46 @@ public class SeckillOrderController {
         // String username = "xy";
         Map<String, String> userINfo = tokenDecode.getUserINfo();
         String username = userINfo.get("user_name");
-        boolean add = seckillOrderService.add(id, time, username);
-        if (add) {
-            return new Result(true, StatusCode.OK, "秒杀下单成功！");
+        try {
+            boolean add = seckillOrderService.add(id, time, username);
+            if (add) {
+                return new Result(true, StatusCode.OK, "秒杀下单成功！");
 
-        } else {
-            return new Result(false, StatusCode.ERROR, "秒杀下单失败！");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false,StatusCode.REPERROR,e.getMessage());
         }
+
+        return new Result(false, StatusCode.ERROR, "秒杀下单失败！");
+
+    }
+
+
+    //秒杀下单测试入口
+    @GetMapping ("/addtest")
+    public Result addTest(String time, Long id,String username) {
+        //    临时写死用户名
+        // String username = "xy";
+        // Map<String, String> userINfo = tokenDecode.getUserINfo();
+        // String username = userINfo.get("user_name");
+        try {
+            boolean add = seckillOrderService.add(id, time, username);
+            if (add) {
+                return new Result(true, StatusCode.OK, "秒杀下单成功！");
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false,StatusCode.REPERROR,e.getMessage());
+        }
+
+        return new Result(false, StatusCode.ERROR, "秒杀下单失败！");
+
     }
 
     /**
-     * 查询抢购
+     * 查询下单状态
      *
      * @return
      */
@@ -182,9 +211,11 @@ public class SeckillOrderController {
         SeckillStatus seckillStatus = seckillOrderService.queryStatus(username);
 
         if (seckillStatus != null) {
-            return new Result(true, seckillStatus.getStatus(), "抢购状态",seckillStatus);
-        } else {
-            return new Result(false, StatusCode.NOTFOUNDERROR, "没有抢购信息");
+            return new Result(true, seckillStatus.getStatus(), "获取秒杀状态成功！",seckillStatus);
+        }
+        else {
+            return new Result(false, StatusCode.NOTFOUNDERROR, "获取秒杀状态失败！");
         }
     }
+
 }

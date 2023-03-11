@@ -67,7 +67,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/seckillGoods/getMenus","/seckillGoods/list*","/seckillGoods/one**")//允许放行地址
+                .antMatchers("/seckillGoods/getMenus","/seckillGoods/list*","/seckillGoods/one*","/seckillOrder/addtest*")//允许放行地址
                 .permitAll()
                 .anyRequest()
                 .authenticated();//除了上面两条，其他地址全部资源保护

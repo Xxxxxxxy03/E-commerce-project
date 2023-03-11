@@ -34,7 +34,7 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
 
         //获取网关请求路径
         String path = request.getURI().getPath();
-        if (path.startsWith("/api/user/login") || path.startsWith("/api/brand/search")|| path.startsWith("/api/seckillGoods/getMenus")|| path.startsWith("/api/seckillOrder/one")) {
+        if (path.startsWith("/api/user/login") || path.startsWith("/api/brand/search")|| path.startsWith("/api/seckillGoods/getMenus")|| path.startsWith("/api/seckillOrder/one")||path.startsWith("/api/seckillOrder/addtest")) {
             //在白名单地址直接放行
             return chain.filter(exchange);
         }

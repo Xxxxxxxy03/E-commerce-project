@@ -1,18 +1,13 @@
 server:
-  port: 9009
+  port: 9011
 spring:
   application:
-    name: pay
-  redis:
+    name: pay-seckill
+  rabbitmq:
     host: 192.168.188.129
-    port: 6379
-  main:
-    allow-bean-definition-overriding: true
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-
+    port: 5672
+    username: guest
+    password: guest
 #把支付宝相关参数配置
 alipay:
   serverUrl: https://openapi.alipaydev.com/gateway.do #支付宝网关地址 沙箱环境网关地址
@@ -22,19 +17,17 @@ alipay:
   charset: UTF-8
   alipayPublicKey: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtyV0Wnf5awbPp9za5La6H79xp1YFi+El9Qd0ZPmb77TerUq3+NIBoamdekD9ZCCqhQn5htQJtVowJzLGm8IxNVhUBYKSOFp9NufRV6/FCV3Cwnyi8Y3e6XZ4z4MPAXa4TDs3U9xMab9izaLjOA2VBG0rZDrOOqIg36wjfIUMrJFYQiAu9LcDeQxqx28ws0UfUw8zo+mDHotuZfa/UKP0dr0NrEpKB8lRRB/C4ypilN9F3CkCLvtJ2AGnlFDBwasJ5n0B/G0SXeFEl4waCBi1e/mr5AWGWoq7cf5kE52Ve1KUBwVsT3YFqxbLyRDdQ6laTZsluSQzrNysB1tMc5fBkQIDAQAB
   signType: RSA2 #密钥类型
-logging:
-  level:
-    com.offcn: debug
-feign:
-  hystrix:
-    enabled: true
-#hystrix 配置
-hystrix:
-  command:
-    default:
-      execution:
-        isolation:
-          thread:
-            timeoutInMilliseconds: 10000
-          strategy: SEMAPHORE #feign和主线程在一起，不要单独启用独立线程
-
+  notifyUrl:  http://14575e73.r6.cpolar.top/pay/notify/url
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+#位置支付交换机和队列
+mq:
+  pay:
+    exchange:
+      seckillorder: exchange.seckillorder
+    queue:
+      seckillorder: queue.seckillorder
+    routing:
+      seckillkey: queue.seckillorder
